@@ -1,0 +1,13 @@
+# Xcode / Apple
+.DS_Store
+build/
+DerivedData/
+*.xcuserstate
+project.xcworkspace/
+xcuserdata/
+
+# Node / Web
+node_modules/
+dist/
+.next/
+*.log

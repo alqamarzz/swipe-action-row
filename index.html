@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SwiftPieces - Swipe Action Row Studio</title>
+  <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+  <style>
+    * {
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    .touch-none-select {
+      touch-action: pan-y;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    .scrollbar-thin::-webkit-scrollbar {
+      width: 4px;
+    }
+    .scrollbar-thin::-webkit-scrollbar-thumb {
+      background: rgba(120,120,120,0.2);
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body class="bg-[#f0efea] dark:bg-[#0a0a0c] text-[#141414] dark:text-[#f2f2f2] min-h-screen p-4 sm:p-8 flex flex-col items-center justify-center transition-colors duration-300">
+
+  <!-- App Header -->
+  <header class="w-full max-w-5xl flex items-center justify-between mb-6">
+    <div class="flex items-center gap-3">
+      <div class="w-9 h-9 rounded-xl bg-black dark:bg-white text-white dark:text-black flex items-center justify-center font-bold text-sm shadow-md">
+        SP
+      </div>
+      <div>
+        <h1 class="text-base font-black tracking-tight flex items-center gap-2">
+          <span>Swipe Action Row</span>
+          <span class="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-600 dark:text-blue-400">iOS 17+ · SwiftPieces</span>
+        </h1>
+        <p class="text-xs text-black/50 dark:text-white/50">Interactive Web Controller & Physics Studio</p>
+      </div>
+    </div>
+
+    <!-- Quick Header Buttons -->
+    <div class="flex items-center gap-2">
+      <button id="audioToggleBtn" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-black/5 dark:bg-white/10 hover:bg-black/10 dark:hover:bg-white/15 text-xs font-semibold transition-all">
+        <svg id="audioIcon" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+        </svg>
+        <span id="audioLabel">Sound On</span>
+      </button>
+
+      <button id="themeToggleBtn" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-black/5 dark:bg-white/10 hover:bg-black/10 dark:hover:bg-white/15 text-xs font-semibold transition-all">
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+        </svg>
+        <span id="themeLabel">Dark</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Studio Two-Column Grid -->
+  <main class="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+    
+    <!-- LEFT COLUMN: The Interactive Device / List Stage (7 cols) -->
+    <div class="lg:col-span-7 flex flex-col items-center">
+      <div class="w-full max-w-[420px] bg-white/70 dark:bg-[#151518] backdrop-blur-xl border border-black/10 dark:border-white/10 rounded-[38px] p-5 shadow-2xl flex flex-col transition-all">
+        
+        <!-- List Header -->
+        <div class="flex items-center justify-between pb-3 mb-3 border-b border-black/5 dark:border-white/10">
+          <div class="flex items-center gap-2">
+            <span class="text-xs font-bold uppercase tracking-wider text-black/70 dark:text-white/70">Messages</span>
+            <span id="unreadBadge" class="text-[11px] px-2 py-0.5 rounded-full font-bold bg-blue-500 text-white">1 unread</span>
+          </div>
+          <span class="text-xs font-mono text-black/40 dark:text-white/40">lists/swipe-action-row</span>
+        </div>
+
+        <!-- Scrollable Rows Container -->
+        <div id="rowContainer" class="flex flex-col gap-2.5 w-full min-h-[310px]">
+          <!-- Rows will be dynamically rendered here -->
+        </div>
+
+        <!-- Add Message Prompt / Empty State -->
+        <div class="mt-4 pt-3 border-t border-black/5 dark:border-white/10 flex items-center justify-between">
+          <button id="addCardBtn" class="text-xs font-semibold text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1">
+            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+            </svg>
+            Add Message
+          </button>
+          
+          <button id="resetCardsBtn" class="text-xs font-semibold text-black/50 dark:text-white/50 hover:text-black dark:hover:text-white transition-colors">
+            Reset List
+          </button>
+        </div>
+
+      </div>
+
+      <!-- Quick Hint -->
+      <p class="text-xs text-black/55 dark:text-white/55 mt-3 text-center">
+        💡 <strong>Swipe 50% left:</strong> Holds open with <strong>Snooze</strong> & <strong>Delete</strong> options · <strong>Swipe extreme left (>80%):</strong> Automatically deletes message
+      </p>
+    </div>
+
+    <!-- RIGHT COLUMN: Control Panel & Live Inspector (5 cols) -->
+    <div class="lg:col-span-5 flex flex-col gap-4">
+      
+      <!-- Control Panel Card -->
+      <div class="bg-white/70 dark:bg-[#151518] backdrop-blur-xl border border-black/10 dark:border-white/10 rounded-[30px] p-5 shadow-lg flex flex-col gap-4">
+        <h2 class="text-xs font-bold uppercase tracking-wider text-black/70 dark:text-white/70 flex items-center gap-2">
+          <svg class="w-4 h-4 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/>
+          </svg>
+          Remote Controller
+        </h2>
+
+        <!-- Interactive Triggers Grid -->
+        <div class="grid grid-cols-2 gap-2">
+          <button id="ctrlPeekJonas" class="p-2.5 rounded-2xl bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 text-xs font-semibold text-left transition-all border border-black/5 dark:border-white/5 flex flex-col">
+            <span class="text-black dark:text-white font-bold">Peek Jonas's Row</span>
+            <span class="text-[11px] text-black/50 dark:text-white/50">Reveal Snooze/Delete</span>
+          </button>
+
+          <button id="ctrlSnoozeJonas" class="p-2.5 rounded-2xl bg-amber-500/10 hover:bg-amber-500/15 text-xs font-semibold text-left transition-all border border-amber-500/20 text-amber-700 dark:text-amber-300 flex flex-col">
+            <span class="font-bold">Snooze Jonas (1-Tap)</span>
+            <span class="text-[11px] opacity-80">Toggle 2h snooze</span>
+          </button>
+
+          <button id="ctrlPeekMara" class="p-2.5 rounded-2xl bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 text-xs font-semibold text-left transition-all border border-black/5 dark:border-white/5 flex flex-col">
+            <span class="text-black dark:text-white font-bold">Swipe Mara Right</span>
+            <span class="text-[11px] text-black/50 dark:text-white/50">Reveal Read Action</span>
+          </button>
+
+          <button id="ctrlCloseAll" class="p-2.5 rounded-2xl bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 text-xs font-semibold text-left transition-all border border-black/5 dark:border-white/5 flex flex-col">
+            <span class="text-black dark:text-white font-bold">Close All Rows</span>
+            <span class="text-[11px] text-black/50 dark:text-white/50">Snap all cards shut</span>
+          </button>
+
+          <button id="ctrlDeleteFirst" class="col-span-2 p-2.5 rounded-2xl bg-red-500/10 hover:bg-red-500/15 text-xs font-semibold text-left transition-all border border-red-500/20 text-red-600 dark:text-red-400 flex flex-col">
+            <span class="font-bold">Full Swipe Delete</span>
+            <span class="text-[11px] opacity-80">Trigger armed extreme swipe</span>
+          </button>
+        </div>
+
+        <!-- Customization Sliders -->
+        <div class="flex flex-col gap-3 pt-2 border-t border-black/5 dark:border-white/10">
+          <div class="flex flex-col gap-1">
+            <div class="flex items-center justify-between text-xs">
+              <span class="font-medium text-black/70 dark:text-white/70">Corner Radius</span>
+              <span id="radiusVal" class="font-mono font-bold text-xs">26px</span>
+            </div>
+            <input id="radiusSlider" type="range" min="16" max="36" value="26" step="1" 
+                   class="w-full accent-blue-500 h-1.5 bg-black/10 dark:bg-white/10 rounded-lg cursor-pointer">
+          </div>
+
+          <div class="flex flex-col gap-1">
+            <div class="flex items-center justify-between text-xs">
+              <span class="font-medium text-black/70 dark:text-white/70">Tile Width</span>
+              <span id="tileWidthVal" class="font-mono font-bold text-xs">78px</span>
+            </div>
+            <input id="tileWidthSlider" type="range" min="60" max="96" value="78" step="2" 
+                   class="w-full accent-blue-500 h-1.5 bg-black/10 dark:bg-white/10 rounded-lg cursor-pointer">
+          </div>
+        </div>
+      </div>
+
+      <!-- Real-Time Activity Log Card -->
+      <div class="bg-white/70 dark:bg-[#151518] backdrop-blur-xl border border-black/10 dark:border-white/10 rounded-[30px] p-5 shadow-lg flex flex-col">
+        <div class="flex items-center justify-between pb-2 mb-2 border-b border-black/5 dark:border-white/10">
+          <h2 class="text-xs font-bold uppercase tracking-wider text-black/70 dark:text-white/70 flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+            Real-Time Activity Log
+          </h2>
+          <button id="clearLogBtn" class="text-[11px] font-semibold text-black/40 dark:text-white/40 hover:text-black dark:hover:text-white">
+            Clear
+          </button>
+        </div>
+
+        <div id="logStream" class="flex flex-col gap-1.5 max-h-[160px] overflow-y-auto scrollbar-thin text-xs font-mono">
+          <div class="text-black/40 dark:text-white/40 italic">Listening for swipe events and gesture transitions...</div>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <script>
+    // State & Config
+    let soundEnabled = true;
+    let cornerRadius = 26;
+    let tileWidth = 78;
+    const tileGap = 6;
+
+    const TILE_INK = "#141414";
+    const SKY_BLUE = "#9cc2ff";
+    const TANGERINE = "#ff0000";
+    const BUTTER = "#ffd976";
+
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    let audioCtx = null;
+
+    function playAudio(freq = 480, duration = 0.04) {
+      if (!soundEnabled) return;
+      try {
+        if (!audioCtx) audioCtx = new AudioCtx();
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration);
+      } catch (e) {}
+    }
+
+    const INITIAL_ITEMS = [
+      {
+        id: "mara",
+        initials: "MA",
+        name: "Mara Lindqvist",
+        subject: "Final cut of the launch film",
+        time: "9:41",
+        avatarBg: "#f3dfbe",
+        unread: true,
+      },
+      {
+        id: "jonas",
+        initials: "JO",
+        name: "Jonas Okafor",
+        subject: "Studio booking for Thursday",
+        time: "8:12",
+        avatarBg: "#a9dcb7",
+        unread: false,
+      },
+      {
+        id: "priya",
+        initials: "PR",
+        name: "Priya Raman",
+        subject: "Notes from the pricing review",
+        time: "Mon",
+        avatarBg: "#cdb8ff",
+        unread: false,
+      },
+      {
+        id: "alex",
+        initials: "AC",
+        name: "Alex Chen",
+        subject: "Design tokens sync update",
+        time: "Fri",
+        avatarBg: "#9cc2ff",
+        unread: false,
+      }
+    ];
+
+    let items = [...INITIAL_ITEMS];
+    let openRowId = null;
+
+    function logEvent(type, text) {
+      const stream = document.getElementById("logStream");
+      const time = new Date().toLocaleTimeString('en-US', { hour12: false, minute: '2-digit', second: '2-digit' });
+      const entry = document.createElement("div");
+      entry.className = "flex items-start gap-2 leading-relaxed";
+
+      let badgeColor = "bg-blue-500/10 text-blue-600 dark:text-blue-400";
+      if (type === "armed") badgeColor = "bg-red-500/10 text-red-600 dark:text-red-400";
+      if (type === "read") badgeColor = "bg-sky-500/10 text-sky-600 dark:text-sky-400";
+      if (type === "snooze") badgeColor = "bg-amber-500/10 text-amber-600 dark:text-amber-400";
+
+      entry.innerHTML = `
+        <span class="text-black/30 dark:text-white/30 shrink-0">[${time}]</span>
+        <span class="px-1.5 py-0.2 rounded font-bold uppercase text-[10px] ${badgeColor} shrink-0">${type}</span>
+        <span class="truncate text-black/75 dark:text-white/75">${text}</span>
+      `;
+      stream.insertBefore(entry, stream.firstChild);
+
+      // limit log size
+      if (stream.children.length > 25) {
+        stream.removeChild(stream.lastChild);
+      }
+    }
+
+    function updateUnreadBadge() {
+      const count = items.filter(x => x.unread).length;
+      const b = document.getElementById("unreadBadge");
+      b.textContent = `${count} unread`;
+      b.style.display = count > 0 ? "inline-block" : "none";
+    }
+
+    function renderList() {
+      const container = document.getElementById("rowContainer");
+      container.innerHTML = "";
+
+      if (items.length === 0) {
+        container.innerHTML = `
+          <div class="py-14 text-center border-2 border-dashed border-black/10 dark:border-white/10 rounded-[28px] flex flex-col items-center justify-center">
+            <span class="text-2xl mb-1">🎉</span>
+            <p class="font-bold text-sm text-black/80 dark:text-white/80">Inbox Zero</p>
+            <p class="text-xs text-black/45 dark:text-white/45 mt-0.5">All conversations cleared</p>
+          </div>
+        `;
+        updateUnreadBadge();
+        return;
+      }
+
+      items.forEach(item => {
+        const el = buildRowElement(item);
+        container.appendChild(el);
+      });
+
+      updateUnreadBadge();
+    }
+
+    function buildRowElement(item) {
+      const wrap = document.createElement("div");
+      wrap.id = `row-${item.id}`;
+      wrap.className = "relative overflow-hidden touch-none-select transition-all";
+      wrap.style.borderRadius = `${cornerRadius}px`;
+
+      const leadRevealWidth = tileWidth + tileGap;
+      const trailRevealWidth = (tileWidth * 2) + tileGap;
+
+      wrap.innerHTML = `
+        <!-- Behind: Action Tiles -->
+        <div class="absolute inset-0 flex items-stretch justify-between pointer-events-auto">
+          <!-- Leading (Read) -->
+          <div class="leading-box flex items-center justify-start overflow-hidden h-full" style="width: 0px;">
+            <div class="flex items-center h-full pr-1.5 pl-0.5">
+              <button class="lead-tile flex flex-col items-center justify-center font-bold text-xs select-none active:scale-95 transition-transform"
+                      style="background-color: ${SKY_BLUE}; color: ${TILE_INK}; width: ${tileWidth}px; height: 100%; border-radius: ${cornerRadius}px;">
+                <svg class="lead-icon w-5 h-5 mb-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                </svg>
+                <span class="lead-label text-[11px] font-bold">${item.unread ? "Read" : "Unread"}</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="flex-1"></div>
+
+          <!-- Trailing (Delete + Snooze) -->
+          <div class="trailing-box flex items-center justify-end overflow-hidden h-full" style="width: 0px;">
+            <div class="flex items-center h-full pl-1.5 pr-0.5 gap-1.5">
+              <button class="snooze-tile flex flex-col items-center justify-center font-bold text-xs select-none active:scale-95 transition-transform"
+                      style="background-color: ${BUTTER}; color: ${TILE_INK}; width: ${tileWidth}px; height: 100%; border-radius: ${cornerRadius}px; transition: width 0.28s cubic-bezier(0.2,0.9,0.3,1.2), opacity 0.2s ease;">
+                <svg class="snooze-icon w-5 h-5 mb-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
+                </svg>
+                <span class="snooze-label text-[11px] font-bold">${item.snoozed ? "Un-snooze" : "Snooze"}</span>
+              </button>
+              <button class="delete-tile flex flex-col items-center justify-center font-bold text-xs select-none active:scale-95 transition-transform"
+                      style="background-color: ${TANGERINE}; color: ${TILE_INK}; width: ${tileWidth}px; height: 100%; border-radius: ${cornerRadius}px; transition: width 0.28s cubic-bezier(0.2,0.9,0.3,1.2);">
+                <svg class="delete-icon w-5 h-5 mb-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                </svg>
+                <span class="delete-label text-[11px] font-bold">Delete</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Foreground Sliding Row Card -->
+        <div class="row-surface relative z-10 bg-white dark:bg-[#1c1c1f] text-[#141414] dark:text-white px-4 py-3.5 flex items-center gap-3.5 cursor-grab active:cursor-grabbing border border-black/[0.05] dark:border-white/[0.07]"
+             style="border-radius: ${cornerRadius}px; transform: translateX(0px);">
+          <div class="w-11 h-11 rounded-full flex items-center justify-center text-xs font-black shrink-0 text-[#141414]"
+               style="background-color: ${item.avatarBg};">
+            ${item.initials}
+          </div>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center justify-between gap-1 mb-0.5">
+              <span class="font-bold text-xs truncate ${item.unread ? 'font-extrabold text-black dark:text-white' : 'text-black/85 dark:text-white/85'}">${item.name}</span>
+              <div class="flex items-center gap-1.5 shrink-0">
+                ${item.snoozed ? '<span class="text-[10px] font-bold px-1.5 py-0.2 rounded-full bg-amber-500/15 text-amber-600 dark:text-amber-400">💤 2h</span>' : ''}
+                <span class="text-xs font-mono text-black/40 dark:text-white/40">${item.time}</span>
+              </div>
+            </div>
+            <p class="text-xs text-black/60 dark:text-white/60 truncate flex items-center gap-1.5">
+              ${item.unread ? '<span class="w-1.5 h-1.5 rounded-full bg-blue-500 shrink-0"></span>' : ''}
+              ${item.subject}
+            </p>
+          </div>
+        </div>
+      `;
+
+      attachGestures(wrap, item);
+      return wrap;
+    }
+
+    function attachGestures(wrap, item) {
+      const card = wrap.querySelector(".row-surface");
+      const leadBox = wrap.querySelector(".leading-box");
+      const trailBox = wrap.querySelector(".trailing-box");
+      const leadTile = wrap.querySelector(".lead-tile");
+      const snoozeTile = wrap.querySelector(".snooze-tile");
+      const delTile = wrap.querySelector(".delete-tile");
+
+      let currentX = 0;
+      let isDragging = false;
+      let isArmed = false;
+
+      const leadFull = tileWidth + tileGap;
+      const trailFull = (tileWidth * 2) + tileGap;
+
+      function update(pos, anim = false) {
+        if (anim) {
+          card.style.transition = "transform 0.4s cubic-bezier(0.18, 0.9, 0.32, 1.15), box-shadow 0.25s ease";
+          leadBox.style.transition = "width 0.4s cubic-bezier(0.18, 0.9, 0.32, 1.15)";
+          trailBox.style.transition = "width 0.4s cubic-bezier(0.18, 0.9, 0.32, 1.15)";
+        } else {
+          card.style.transition = "none";
+          leadBox.style.transition = "none";
+          trailBox.style.transition = "none";
+        }
+
+        card.style.transform = `translateX(${pos}px)`;
+        const lift = Math.min(1, Math.abs(pos) / 40);
+        card.style.boxShadow = lift > 0 
+          ? `0 ${4 * lift}px ${14 * lift}px rgba(0,0,0,${0.16 * lift}), ${pos > 0 ? -3 : 3}px 0 6px rgba(0,0,0,${0.06 * lift})`
+          : "none";
+
+        const lW = Math.max(0, pos);
+        leadBox.style.width = `${lW}px`;
+        const tW = Math.max(0, -pos);
+        trailBox.style.width = `${tW}px`;
+
+        if (lW > 0) {
+          const p = Math.min(1, lW / leadFull);
+          wrap.querySelector(".lead-icon").style.transform = `scale(${isArmed ? 1.2 : 0.55 + 0.45 * p})`;
+          wrap.querySelector(".lead-label").style.opacity = Math.max(0, (p - 0.45) / 0.55);
+        }
+        if (tW > 0) {
+          const p = Math.min(1, tW / trailFull);
+          wrap.querySelector(".delete-icon").style.transform = `scale(${isArmed ? 1.2 : 0.55 + 0.45 * p})`;
+          wrap.querySelector(".delete-label").style.opacity = Math.max(0, (p - 0.45) / 0.55);
+          wrap.querySelector(".snooze-icon").style.transform = `scale(${0.55 + 0.45 * p})`;
+          wrap.querySelector(".snooze-label").style.opacity = Math.max(0, (p - 0.45) / 0.55);
+        }
+
+        const width = wrap.offsetWidth || 360;
+        // Require deliberate extreme swipe (>80% width or at least 275px) to arm full-swipe delete
+        const extremeTrailThresh = Math.max(width * 0.80, 270);
+        const extremeLeadThresh = Math.max(width * 0.80, 270);
+
+        const armedNow = (pos < -extremeTrailThresh) || (pos > extremeLeadThresh);
+
+        if (armedNow !== isArmed) {
+          isArmed = armedNow;
+          playAudio(isArmed ? 720 : 420, isArmed ? 0.06 : 0.03);
+          logEvent(isArmed ? "armed" : "motion", `Armed threshold: ${isArmed ? 'YES (Extreme Swipe)' : 'NO'}`);
+
+          if (pos < 0) {
+            if (isArmed) {
+              // Only at extreme left does delete take over the full bar
+              snoozeTile.style.width = "0px";
+              snoozeTile.style.opacity = "0";
+              delTile.style.width = `${Math.max(tW - 8, tileWidth)}px`;
+            } else {
+              snoozeTile.style.width = `${tileWidth}px`;
+              snoozeTile.style.opacity = "1";
+              delTile.style.width = `${tileWidth}px`;
+            }
+          } else if (pos > 0) {
+            leadTile.style.width = isArmed ? `${Math.max(lW - 8, tileWidth)}px` : `${tileWidth}px`;
+          }
+        } else if (isArmed) {
+          if (pos < 0) delTile.style.width = `${Math.max(tW - 8, tileWidth)}px`;
+          if (pos > 0) leadTile.style.width = `${Math.max(lW - 8, tileWidth)}px`;
+        } else {
+          // Normal drag or 50% swipe: ensure BOTH Snooze & Delete stay completely visible
+          snoozeTile.style.width = `${tileWidth}px`;
+          snoozeTile.style.opacity = "1";
+          delTile.style.width = `${tileWidth}px`;
+        }
+      }
+
+      function settle(target) {
+        currentX = target;
+        update(target, true);
+        if (target !== 0) {
+          openRowId = item.id;
+          document.querySelectorAll("#rowContainer > div").forEach(w => {
+            if (w.id !== `row-${item.id}` && w.settle) {
+              w.settle(0);
+            }
+          });
+        } else if (openRowId === item.id) {
+          openRowId = null;
+        }
+      }
+
+      let pointerStartX = 0;
+      let initialOffset = 0;
+      let dragDistance = 0;
+
+      card.addEventListener("pointerdown", (e) => {
+        isDragging = true;
+        dragDistance = 0;
+        pointerStartX = e.clientX;
+        initialOffset = currentX;
+        card.setPointerCapture(e.pointerId);
+        logEvent("drag", `Dragging "${item.name}"`);
+      });
+
+      card.addEventListener("pointermove", (e) => {
+        if (!isDragging) return;
+        const dx = e.clientX - pointerStartX;
+        dragDistance = Math.abs(dx);
+        currentX = initialOffset + dx;
+        update(currentX);
+
+        // Active highlight on Snooze tile while dragging in Snooze range
+        const inSnoozeZone = currentX <= -50 && currentX > -240;
+        if (inSnoozeZone) {
+          snoozeTile.style.transform = "scale(1.05)";
+          snoozeTile.style.boxShadow = "0 0 14px rgba(255, 217, 118, 0.75)";
+        } else {
+          snoozeTile.style.transform = "scale(1)";
+          snoozeTile.style.boxShadow = "none";
+        }
+      });
+
+      function onEnd(e) {
+        if (!isDragging) return;
+        isDragging = false;
+        try { card.releasePointerCapture(e.pointerId); } catch (_) {}
+        snoozeTile.style.transform = "scale(1)";
+        snoozeTile.style.boxShadow = "none";
+
+        // Check if user released pointer directly over Snooze or Delete tile while dragging
+        const dropEl = document.elementFromPoint(e.clientX, e.clientY);
+        if (dropEl && (dropEl === snoozeTile || snoozeTile.contains(dropEl))) {
+          logEvent("snooze", `Direct tap/drop on Snooze: "${item.name}"`);
+          playAudio(640, 0.06);
+          executeSnooze(item.id);
+          settle(0);
+          return;
+        }
+        if (dropEl && (dropEl === delTile || delTile.contains(dropEl))) {
+          logEvent("delete", `Direct tap/drop on Delete: "${item.name}"`);
+          playAudio(320, 0.07);
+          executeDelete(item.id);
+          return;
+        }
+
+        const width = wrap.offsetWidth || 360;
+        const extremeTrailThresh = Math.max(width * 0.80, 270);
+        const extremeLeadThresh = Math.max(width * 0.80, 270);
+
+        // 1. Extreme left swipe: Delete immediately
+        if (currentX < -extremeTrailThresh) {
+          isArmed = false;
+          logEvent("delete", `Extreme left swipe: Deleted "${item.name}"`);
+          executeDelete(item.id);
+          return;
+        }
+
+        // 2. Extreme right swipe: Toggle Read
+        if (currentX > extremeLeadThresh) {
+          isArmed = false;
+          logEvent("read", `Extreme right swipe: Toggled read for "${item.name}"`);
+          toggleRead(item.id);
+          settle(0);
+          return;
+        }
+
+        isArmed = false;
+
+        // 3. Normal 50% swipe left: Settle and HOLD firmly open to give Snooze & Delete choices
+        if (currentX < -45) {
+          logEvent("reveal", `Held open: Snooze & Delete options ready for "${item.name}"`);
+          settle(-trailFull);
+        } else if (currentX > 40) {
+          logEvent("reveal", `Held open: Read option for "${item.name}"`);
+          settle(leadFull);
+        } else {
+          settle(0);
+        }
+      }
+
+      card.addEventListener("pointerup", onEnd);
+      card.addEventListener("pointercancel", onEnd);
+
+      // Prevent the card from snapping shut from the drag's mouse release!
+      card.addEventListener("click", () => {
+        if (dragDistance > 6) {
+          dragDistance = 0;
+          return; // Ignore click that occurred because of dragging
+        }
+        if (currentX !== 0) {
+          settle(0);
+        }
+      });
+
+      leadTile.addEventListener("pointerdown", (e) => {
+        e.stopPropagation();
+      });
+      leadTile.addEventListener("click", (e) => {
+        e.stopPropagation();
+        playAudio(560, 0.04);
+        logEvent("read", `Toggled read state for "${item.name}"`);
+        toggleRead(item.id);
+        settle(0);
+      });
+
+      snoozeTile.addEventListener("pointerdown", (e) => {
+        e.stopPropagation();
+        playAudio(640, 0.06);
+        executeSnooze(item.id);
+        settle(0);
+      });
+      snoozeTile.addEventListener("click", (e) => {
+        e.stopPropagation();
+        playAudio(640, 0.06);
+        executeSnooze(item.id);
+        settle(0);
+      });
+
+      delTile.addEventListener("pointerdown", (e) => {
+        e.stopPropagation();
+      });
+      delTile.addEventListener("click", (e) => {
+        e.stopPropagation();
+        playAudio(320, 0.07);
+        logEvent("delete", `Tapped delete on "${item.name}"`);
+        executeDelete(item.id);
+      });
+
+      wrap.settle = settle;
+    }
+
+    function toggleRead(id) {
+      const idx = items.findIndex(x => x.id === id);
+      if (idx !== -1) {
+        items[idx].unread = !items[idx].unread;
+        renderList();
+      }
+    }
+
+    function executeSnooze(id) {
+      const idx = items.findIndex(x => x.id === id);
+      if (idx !== -1) {
+        items[idx].snoozed = !items[idx].snoozed;
+        const isSnoozed = items[idx].snoozed;
+        logEvent("snooze", isSnoozed ? `Snoozed "${items[idx].name}" for 2 hours` : `Resumed "${items[idx].name}" from snooze`);
+        renderList();
+      }
+    }
+
+    function executeDelete(id) {
+      const wrap = document.getElementById(`row-${id}`);
+      if (wrap) {
+        wrap.style.transition = "transform 0.35s ease, opacity 0.3s ease, max-height 0.35s ease, margin 0.35s ease";
+        wrap.style.transform = "translateX(-120%) scale(0.9)";
+        wrap.style.opacity = "0";
+        setTimeout(() => {
+          wrap.style.maxHeight = "0px";
+          wrap.style.margin = "0px";
+        }, 120);
+
+        setTimeout(() => {
+          items = items.filter(x => x.id !== id);
+          renderList();
+        }, 380);
+      }
+    }
+
+    // Remote Control Bindings
+    document.getElementById("ctrlPeekJonas").addEventListener("click", () => {
+      const row = document.getElementById("row-jonas");
+      if (row && row.settle) {
+        row.settle(-((tileWidth * 2) + tileGap));
+        logEvent("remote", "Remote: Opened Jonas's trailing actions");
+      }
+    });
+
+    document.getElementById("ctrlSnoozeJonas").addEventListener("click", () => {
+      executeSnooze("jonas");
+      playAudio(640, 0.06);
+    });
+
+    document.getElementById("ctrlPeekMara").addEventListener("click", () => {
+      const row = document.getElementById("row-mara");
+      if (row && row.settle) {
+        row.settle(tileWidth + tileGap);
+        logEvent("remote", "Remote: Swiped Mara's row right");
+      }
+    });
+
+    document.getElementById("ctrlCloseAll").addEventListener("click", () => {
+      document.querySelectorAll("#rowContainer > div").forEach(w => {
+        if (w.settle) w.settle(0);
+      });
+      logEvent("remote", "Remote: Closed all rows");
+    });
+
+    document.getElementById("ctrlDeleteFirst").addEventListener("click", () => {
+      if (items.length > 0) {
+        const first = items[0];
+        const row = document.getElementById(`row-${first.id}`);
+        if (row && row.settle) {
+          row.settle(-260); // Trigger armed swipe visually first
+          setTimeout(() => {
+            executeDelete(first.id);
+            logEvent("delete", `Remote: Full swipe delete executed on "${first.name}"`);
+          }, 350);
+        }
+      }
+    });
+
+    // Customization Sliders
+    document.getElementById("radiusSlider").addEventListener("input", (e) => {
+      cornerRadius = parseInt(e.target.value);
+      document.getElementById("radiusVal").textContent = `${cornerRadius}px`;
+      renderList();
+    });
+
+    document.getElementById("tileWidthSlider").addEventListener("input", (e) => {
+      tileWidth = parseInt(e.target.value);
+      document.getElementById("tileWidthVal").textContent = `${tileWidth}px`;
+      renderList();
+    });
+
+    // Add card
+    document.getElementById("addCardBtn").addEventListener("click", () => {
+      const names = ["Elena Rostova", "Marcus Brody", "Sophia Lin", "Tariq Mansoor"];
+      const subjects = ["Quarterly roadmapping update", "Design system alignment", "New prototype feedback", "Release candidate 2.4"];
+      const colors = ["#ffd976", "#a9dcb7", "#9cc2ff", "#cdb8ff"];
+      const idx = Math.floor(Math.random() * names.length);
+      const newId = "user-" + Date.now();
+
+      items.unshift({
+        id: newId,
+        initials: names[idx].split(" ").map(w => w[0]).join(""),
+        name: names[idx],
+        subject: subjects[idx],
+        time: "Just now",
+        avatarBg: colors[idx],
+        unread: true
+      });
+
+      renderList();
+      logEvent("create", `Added new conversation: "${names[idx]}"`);
+    });
+
+    // Reset list
+    document.getElementById("resetCardsBtn").addEventListener("click", () => {
+      items = JSON.parse(JSON.stringify(INITIAL_ITEMS));
+      renderList();
+      logEvent("reset", "Reset all messages to initial state");
+    });
+
+    // Clear logs
+    document.getElementById("clearLogBtn").addEventListener("click", () => {
+      document.getElementById("logStream").innerHTML = `<div class="text-black/40 dark:text-white/40 italic">Log cleared. Ready for next events.</div>`;
+    });
+
+    // Audio toggle
+    document.getElementById("audioToggleBtn").addEventListener("click", () => {
+      soundEnabled = !soundEnabled;
+      document.getElementById("audioLabel").textContent = soundEnabled ? "Sound On" : "Muted";
+      document.getElementById("audioIcon").innerHTML = soundEnabled
+        ? `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />`
+        : `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15zM17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" />`;
+    });
+
+    // Theme toggle
+    document.getElementById("themeToggleBtn").addEventListener("click", () => {
+      const isDark = document.documentElement.classList.toggle("dark");
+      document.getElementById("themeLabel").textContent = isDark ? "Light" : "Dark";
+      playAudio(620, 0.05);
+    });
+
+    // Initial render
+    renderList();
+
+    // Auto peek Jonas row initially
+    setTimeout(() => {
+      const row = document.getElementById("row-jonas");
+      if (row && row.settle) {
+        row.settle(-((tileWidth * 2) + tileGap));
+        logEvent("init", "Demo: Peeked Jonas Okafor's trailing actions");
+      }
+    }, 700);
+  </script>
+</body>
+</html>
