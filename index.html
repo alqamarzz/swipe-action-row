@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SwiftPieces - Swipe Action Row Studio</title>
+  <title>SwiftPieces - Swipe Action Row</title>
   <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
   <style>
     * {
@@ -15,19 +15,12 @@
       user-select: none;
       -webkit-user-select: none;
     }
-    .scrollbar-thin::-webkit-scrollbar {
-      width: 4px;
-    }
-    .scrollbar-thin::-webkit-scrollbar-thumb {
-      background: rgba(120,120,120,0.2);
-      border-radius: 4px;
-    }
   </style>
 </head>
 <body class="bg-[#f0efea] dark:bg-[#0a0a0c] text-[#141414] dark:text-[#f2f2f2] min-h-screen p-4 sm:p-8 flex flex-col items-center justify-center transition-colors duration-300">
 
   <!-- App Header -->
-  <header class="w-full max-w-5xl flex items-center justify-between mb-6">
+  <header class="w-full max-w-[420px] flex items-center justify-between mb-6">
     <div class="flex items-center gap-3">
       <div class="w-9 h-9 rounded-xl bg-black dark:bg-white text-white dark:text-black flex items-center justify-center font-bold text-sm shadow-md">
         SP
@@ -37,159 +30,69 @@
           <span>Swipe Action Row</span>
           <span class="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-600 dark:text-blue-400">iOS 17+ · SwiftPieces</span>
         </h1>
-        <p class="text-xs text-black/50 dark:text-white/50">Interactive Web Controller & Physics Studio</p>
+        <p class="text-xs text-black/50 dark:text-white/50">Custom Swipe Actions Component</p>
       </div>
     </div>
 
-    <!-- Quick Header Buttons -->
     <div class="flex items-center gap-2">
-      <button id="audioToggleBtn" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-black/5 dark:bg-white/10 hover:bg-black/10 dark:hover:bg-white/15 text-xs font-semibold transition-all">
+      <button id="audioToggleBtn" class="p-2 rounded-full bg-black/5 dark:bg-white/10 hover:bg-black/10 dark:hover:bg-white/15 transition-all" title="Toggle Sound">
         <svg id="audioIcon" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
         </svg>
-        <span id="audioLabel">Sound On</span>
       </button>
 
-      <button id="themeToggleBtn" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-black/5 dark:bg-white/10 hover:bg-black/10 dark:hover:bg-white/15 text-xs font-semibold transition-all">
+      <button id="themeToggleBtn" class="p-2 rounded-full bg-black/5 dark:bg-white/10 hover:bg-black/10 dark:hover:bg-white/15 transition-all" title="Toggle Theme">
         <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
         </svg>
-        <span id="themeLabel">Dark</span>
       </button>
     </div>
   </header>
 
-  <!-- Studio Two-Column Grid -->
-  <main class="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-    
-    <!-- LEFT COLUMN: The Interactive Device / List Stage (7 cols) -->
-    <div class="lg:col-span-7 flex flex-col items-center">
-      <div class="w-full max-w-[420px] bg-white/70 dark:bg-[#151518] backdrop-blur-xl border border-black/10 dark:border-white/10 rounded-[38px] p-5 shadow-2xl flex flex-col transition-all">
+  <main class="w-full max-w-[420px]">
+    <div class="bg-white/70 dark:bg-[#151518] backdrop-blur-xl border border-black/10 dark:border-white/10 rounded-[38px] p-5 shadow-2xl flex flex-col transition-all">
         
-        <!-- List Header -->
-        <div class="flex items-center justify-between pb-3 mb-3 border-b border-black/5 dark:border-white/10">
-          <div class="flex items-center gap-2">
-            <span class="text-xs font-bold uppercase tracking-wider text-black/70 dark:text-white/70">Messages</span>
-            <span id="unreadBadge" class="text-[11px] px-2 py-0.5 rounded-full font-bold bg-blue-500 text-white">1 unread</span>
-          </div>
-          <span class="text-xs font-mono text-black/40 dark:text-white/40">lists/swipe-action-row</span>
+      <!-- List Header -->
+      <div class="flex items-center justify-between pb-3 mb-3 border-b border-black/5 dark:border-white/10">
+        <div class="flex items-center gap-2">
+          <span class="text-xs font-bold uppercase tracking-wider text-black/70 dark:text-white/70">Messages</span>
+          <span id="unreadBadge" class="text-[11px] px-2 py-0.5 rounded-full font-bold bg-blue-500 text-white">1 unread</span>
         </div>
-
-        <!-- Scrollable Rows Container -->
-        <div id="rowContainer" class="flex flex-col gap-2.5 w-full min-h-[310px]">
-          <!-- Rows will be dynamically rendered here -->
-        </div>
-
-        <!-- Add Message Prompt / Empty State -->
-        <div class="mt-4 pt-3 border-t border-black/5 dark:border-white/10 flex items-center justify-between">
-          <button id="addCardBtn" class="text-xs font-semibold text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1">
-            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-            </svg>
-            Add Message
-          </button>
-          
-          <button id="resetCardsBtn" class="text-xs font-semibold text-black/50 dark:text-white/50 hover:text-black dark:hover:text-white transition-colors">
-            Reset List
-          </button>
-        </div>
-
+        <span class="text-xs font-mono text-black/40 dark:text-white/40">lists/swipe-action-row</span>
       </div>
 
-      <!-- Quick Hint -->
-      <p class="text-xs text-black/55 dark:text-white/55 mt-3 text-center">
-        💡 <strong>Swipe 50% left:</strong> Holds open with <strong>Snooze</strong> & <strong>Delete</strong> options · <strong>Swipe extreme left (>80%):</strong> Automatically deletes message
-      </p>
-    </div>
+      <!-- Scrollable Rows Container -->
+      <div id="rowContainer" class="flex flex-col gap-2.5 w-full min-h-[310px]">
+        <!-- Rows dynamically rendered here -->
+      </div>
 
-    <!-- RIGHT COLUMN: Control Panel & Live Inspector (5 cols) -->
-    <div class="lg:col-span-5 flex flex-col gap-4">
-      
-      <!-- Control Panel Card -->
-      <div class="bg-white/70 dark:bg-[#151518] backdrop-blur-xl border border-black/10 dark:border-white/10 rounded-[30px] p-5 shadow-lg flex flex-col gap-4">
-        <h2 class="text-xs font-bold uppercase tracking-wider text-black/70 dark:text-white/70 flex items-center gap-2">
-          <svg class="w-4 h-4 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/>
+      <!-- Add Message / Reset State -->
+      <div class="mt-4 pt-3 border-t border-black/5 dark:border-white/10 flex items-center justify-between">
+        <button id="addCardBtn" class="text-xs font-semibold text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1">
+          <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
           </svg>
-          Remote Controller
-        </h2>
-
-        <!-- Interactive Triggers Grid -->
-        <div class="grid grid-cols-2 gap-2">
-          <button id="ctrlPeekJonas" class="p-2.5 rounded-2xl bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 text-xs font-semibold text-left transition-all border border-black/5 dark:border-white/5 flex flex-col">
-            <span class="text-black dark:text-white font-bold">Peek Jonas's Row</span>
-            <span class="text-[11px] text-black/50 dark:text-white/50">Reveal Snooze/Delete</span>
-          </button>
-
-          <button id="ctrlSnoozeJonas" class="p-2.5 rounded-2xl bg-amber-500/10 hover:bg-amber-500/15 text-xs font-semibold text-left transition-all border border-amber-500/20 text-amber-700 dark:text-amber-300 flex flex-col">
-            <span class="font-bold">Snooze Jonas (1-Tap)</span>
-            <span class="text-[11px] opacity-80">Toggle 2h snooze</span>
-          </button>
-
-          <button id="ctrlPeekMara" class="p-2.5 rounded-2xl bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 text-xs font-semibold text-left transition-all border border-black/5 dark:border-white/5 flex flex-col">
-            <span class="text-black dark:text-white font-bold">Swipe Mara Right</span>
-            <span class="text-[11px] text-black/50 dark:text-white/50">Reveal Read Action</span>
-          </button>
-
-          <button id="ctrlCloseAll" class="p-2.5 rounded-2xl bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 text-xs font-semibold text-left transition-all border border-black/5 dark:border-white/5 flex flex-col">
-            <span class="text-black dark:text-white font-bold">Close All Rows</span>
-            <span class="text-[11px] text-black/50 dark:text-white/50">Snap all cards shut</span>
-          </button>
-
-          <button id="ctrlDeleteFirst" class="col-span-2 p-2.5 rounded-2xl bg-red-500/10 hover:bg-red-500/15 text-xs font-semibold text-left transition-all border border-red-500/20 text-red-600 dark:text-red-400 flex flex-col">
-            <span class="font-bold">Full Swipe Delete</span>
-            <span class="text-[11px] opacity-80">Trigger armed extreme swipe</span>
-          </button>
-        </div>
-
-        <!-- Customization Sliders -->
-        <div class="flex flex-col gap-3 pt-2 border-t border-black/5 dark:border-white/10">
-          <div class="flex flex-col gap-1">
-            <div class="flex items-center justify-between text-xs">
-              <span class="font-medium text-black/70 dark:text-white/70">Corner Radius</span>
-              <span id="radiusVal" class="font-mono font-bold text-xs">26px</span>
-            </div>
-            <input id="radiusSlider" type="range" min="16" max="36" value="26" step="1" 
-                   class="w-full accent-blue-500 h-1.5 bg-black/10 dark:bg-white/10 rounded-lg cursor-pointer">
-          </div>
-
-          <div class="flex flex-col gap-1">
-            <div class="flex items-center justify-between text-xs">
-              <span class="font-medium text-black/70 dark:text-white/70">Tile Width</span>
-              <span id="tileWidthVal" class="font-mono font-bold text-xs">78px</span>
-            </div>
-            <input id="tileWidthSlider" type="range" min="60" max="96" value="78" step="2" 
-                   class="w-full accent-blue-500 h-1.5 bg-black/10 dark:bg-white/10 rounded-lg cursor-pointer">
-          </div>
-        </div>
-      </div>
-
-      <!-- Real-Time Activity Log Card -->
-      <div class="bg-white/70 dark:bg-[#151518] backdrop-blur-xl border border-black/10 dark:border-white/10 rounded-[30px] p-5 shadow-lg flex flex-col">
-        <div class="flex items-center justify-between pb-2 mb-2 border-b border-black/5 dark:border-white/10">
-          <h2 class="text-xs font-bold uppercase tracking-wider text-black/70 dark:text-white/70 flex items-center gap-1.5">
-            <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
-            Real-Time Activity Log
-          </h2>
-          <button id="clearLogBtn" class="text-[11px] font-semibold text-black/40 dark:text-white/40 hover:text-black dark:hover:text-white">
-            Clear
-          </button>
-        </div>
-
-        <div id="logStream" class="flex flex-col gap-1.5 max-h-[160px] overflow-y-auto scrollbar-thin text-xs font-mono">
-          <div class="text-black/40 dark:text-white/40 italic">Listening for swipe events and gesture transitions...</div>
-        </div>
+          Add Message
+        </button>
+        
+        <button id="resetCardsBtn" class="text-xs font-semibold text-black/50 dark:text-white/50 hover:text-black dark:hover:text-white transition-colors">
+          Reset List
+        </button>
       </div>
 
     </div>
 
+    <!-- Quick Hint -->
+    <p class="text-xs text-black/55 dark:text-white/55 mt-3 text-center">
+      💡 <strong>Swipe 50% left:</strong> Reveals <strong>Snooze</strong> & <strong>Delete</strong> · <strong>Swipe extreme left (>80%):</strong> Auto-deletes
+    </p>
   </main>
 
   <script>
     // State & Config
     let soundEnabled = true;
-    let cornerRadius = 26;
-    let tileWidth = 78;
+    const cornerRadius = 26;
+    const tileWidth = 78;
     const tileGap = 6;
 
     const TILE_INK = "#141414";
@@ -259,30 +162,6 @@
     let items = [...INITIAL_ITEMS];
     let openRowId = null;
 
-    function logEvent(type, text) {
-      const stream = document.getElementById("logStream");
-      const time = new Date().toLocaleTimeString('en-US', { hour12: false, minute: '2-digit', second: '2-digit' });
-      const entry = document.createElement("div");
-      entry.className = "flex items-start gap-2 leading-relaxed";
-
-      let badgeColor = "bg-blue-500/10 text-blue-600 dark:text-blue-400";
-      if (type === "armed") badgeColor = "bg-red-500/10 text-red-600 dark:text-red-400";
-      if (type === "read") badgeColor = "bg-sky-500/10 text-sky-600 dark:text-sky-400";
-      if (type === "snooze") badgeColor = "bg-amber-500/10 text-amber-600 dark:text-amber-400";
-
-      entry.innerHTML = `
-        <span class="text-black/30 dark:text-white/30 shrink-0">[${time}]</span>
-        <span class="px-1.5 py-0.2 rounded font-bold uppercase text-[10px] ${badgeColor} shrink-0">${type}</span>
-        <span class="truncate text-black/75 dark:text-white/75">${text}</span>
-      `;
-      stream.insertBefore(entry, stream.firstChild);
-
-      // limit log size
-      if (stream.children.length > 25) {
-        stream.removeChild(stream.lastChild);
-      }
-    }
-
     function updateUnreadBadge() {
       const count = items.filter(x => x.unread).length;
       const b = document.getElementById("unreadBadge");
@@ -319,9 +198,6 @@
       wrap.id = `row-${item.id}`;
       wrap.className = "relative overflow-hidden touch-none-select transition-all";
       wrap.style.borderRadius = `${cornerRadius}px`;
-
-      const leadRevealWidth = tileWidth + tileGap;
-      const trailRevealWidth = (tileWidth * 2) + tileGap;
 
       wrap.innerHTML = `
         <!-- Behind: Action Tiles -->
@@ -440,7 +316,6 @@
         }
 
         const width = wrap.offsetWidth || 360;
-        // Require deliberate extreme swipe (>80% width or at least 275px) to arm full-swipe delete
         const extremeTrailThresh = Math.max(width * 0.80, 270);
         const extremeLeadThresh = Math.max(width * 0.80, 270);
 
@@ -449,11 +324,9 @@
         if (armedNow !== isArmed) {
           isArmed = armedNow;
           playAudio(isArmed ? 720 : 420, isArmed ? 0.06 : 0.03);
-          logEvent(isArmed ? "armed" : "motion", `Armed threshold: ${isArmed ? 'YES (Extreme Swipe)' : 'NO'}`);
 
           if (pos < 0) {
             if (isArmed) {
-              // Only at extreme left does delete take over the full bar
               snoozeTile.style.width = "0px";
               snoozeTile.style.opacity = "0";
               delTile.style.width = `${Math.max(tW - 8, tileWidth)}px`;
@@ -469,7 +342,6 @@
           if (pos < 0) delTile.style.width = `${Math.max(tW - 8, tileWidth)}px`;
           if (pos > 0) leadTile.style.width = `${Math.max(lW - 8, tileWidth)}px`;
         } else {
-          // Normal drag or 50% swipe: ensure BOTH Snooze & Delete stay completely visible
           snoozeTile.style.width = `${tileWidth}px`;
           snoozeTile.style.opacity = "1";
           delTile.style.width = `${tileWidth}px`;
@@ -501,7 +373,6 @@
         pointerStartX = e.clientX;
         initialOffset = currentX;
         card.setPointerCapture(e.pointerId);
-        logEvent("drag", `Dragging "${item.name}"`);
       });
 
       card.addEventListener("pointermove", (e) => {
@@ -511,7 +382,6 @@
         currentX = initialOffset + dx;
         update(currentX);
 
-        // Active highlight on Snooze tile while dragging in Snooze range
         const inSnoozeZone = currentX <= -50 && currentX > -240;
         if (inSnoozeZone) {
           snoozeTile.style.transform = "scale(1.05)";
@@ -529,17 +399,14 @@
         snoozeTile.style.transform = "scale(1)";
         snoozeTile.style.boxShadow = "none";
 
-        // Check if user released pointer directly over Snooze or Delete tile while dragging
         const dropEl = document.elementFromPoint(e.clientX, e.clientY);
         if (dropEl && (dropEl === snoozeTile || snoozeTile.contains(dropEl))) {
-          logEvent("snooze", `Direct tap/drop on Snooze: "${item.name}"`);
           playAudio(640, 0.06);
           executeSnooze(item.id);
           settle(0);
           return;
         }
         if (dropEl && (dropEl === delTile || delTile.contains(dropEl))) {
-          logEvent("delete", `Direct tap/drop on Delete: "${item.name}"`);
           playAudio(320, 0.07);
           executeDelete(item.id);
           return;
@@ -549,18 +416,14 @@
         const extremeTrailThresh = Math.max(width * 0.80, 270);
         const extremeLeadThresh = Math.max(width * 0.80, 270);
 
-        // 1. Extreme left swipe: Delete immediately
         if (currentX < -extremeTrailThresh) {
           isArmed = false;
-          logEvent("delete", `Extreme left swipe: Deleted "${item.name}"`);
           executeDelete(item.id);
           return;
         }
 
-        // 2. Extreme right swipe: Toggle Read
         if (currentX > extremeLeadThresh) {
           isArmed = false;
-          logEvent("read", `Extreme right swipe: Toggled read for "${item.name}"`);
           toggleRead(item.id);
           settle(0);
           return;
@@ -568,12 +431,9 @@
 
         isArmed = false;
 
-        // 3. Normal 50% swipe left: Settle and HOLD firmly open to give Snooze & Delete choices
         if (currentX < -45) {
-          logEvent("reveal", `Held open: Snooze & Delete options ready for "${item.name}"`);
           settle(-trailFull);
         } else if (currentX > 40) {
-          logEvent("reveal", `Held open: Read option for "${item.name}"`);
           settle(leadFull);
         } else {
           settle(0);
@@ -583,11 +443,10 @@
       card.addEventListener("pointerup", onEnd);
       card.addEventListener("pointercancel", onEnd);
 
-      // Prevent the card from snapping shut from the drag's mouse release!
       card.addEventListener("click", () => {
         if (dragDistance > 6) {
           dragDistance = 0;
-          return; // Ignore click that occurred because of dragging
+          return;
         }
         if (currentX !== 0) {
           settle(0);
@@ -600,7 +459,6 @@
       leadTile.addEventListener("click", (e) => {
         e.stopPropagation();
         playAudio(560, 0.04);
-        logEvent("read", `Toggled read state for "${item.name}"`);
         toggleRead(item.id);
         settle(0);
       });
@@ -624,7 +482,6 @@
       delTile.addEventListener("click", (e) => {
         e.stopPropagation();
         playAudio(320, 0.07);
-        logEvent("delete", `Tapped delete on "${item.name}"`);
         executeDelete(item.id);
       });
 
@@ -643,8 +500,6 @@
       const idx = items.findIndex(x => x.id === id);
       if (idx !== -1) {
         items[idx].snoozed = !items[idx].snoozed;
-        const isSnoozed = items[idx].snoozed;
-        logEvent("snooze", isSnoozed ? `Snoozed "${items[idx].name}" for 2 hours` : `Resumed "${items[idx].name}" from snooze`);
         renderList();
       }
     }
@@ -667,62 +522,6 @@
       }
     }
 
-    // Remote Control Bindings
-    document.getElementById("ctrlPeekJonas").addEventListener("click", () => {
-      const row = document.getElementById("row-jonas");
-      if (row && row.settle) {
-        row.settle(-((tileWidth * 2) + tileGap));
-        logEvent("remote", "Remote: Opened Jonas's trailing actions");
-      }
-    });
-
-    document.getElementById("ctrlSnoozeJonas").addEventListener("click", () => {
-      executeSnooze("jonas");
-      playAudio(640, 0.06);
-    });
-
-    document.getElementById("ctrlPeekMara").addEventListener("click", () => {
-      const row = document.getElementById("row-mara");
-      if (row && row.settle) {
-        row.settle(tileWidth + tileGap);
-        logEvent("remote", "Remote: Swiped Mara's row right");
-      }
-    });
-
-    document.getElementById("ctrlCloseAll").addEventListener("click", () => {
-      document.querySelectorAll("#rowContainer > div").forEach(w => {
-        if (w.settle) w.settle(0);
-      });
-      logEvent("remote", "Remote: Closed all rows");
-    });
-
-    document.getElementById("ctrlDeleteFirst").addEventListener("click", () => {
-      if (items.length > 0) {
-        const first = items[0];
-        const row = document.getElementById(`row-${first.id}`);
-        if (row && row.settle) {
-          row.settle(-260); // Trigger armed swipe visually first
-          setTimeout(() => {
-            executeDelete(first.id);
-            logEvent("delete", `Remote: Full swipe delete executed on "${first.name}"`);
-          }, 350);
-        }
-      }
-    });
-
-    // Customization Sliders
-    document.getElementById("radiusSlider").addEventListener("input", (e) => {
-      cornerRadius = parseInt(e.target.value);
-      document.getElementById("radiusVal").textContent = `${cornerRadius}px`;
-      renderList();
-    });
-
-    document.getElementById("tileWidthSlider").addEventListener("input", (e) => {
-      tileWidth = parseInt(e.target.value);
-      document.getElementById("tileWidthVal").textContent = `${tileWidth}px`;
-      renderList();
-    });
-
     // Add card
     document.getElementById("addCardBtn").addEventListener("click", () => {
       const names = ["Elena Rostova", "Marcus Brody", "Sophia Lin", "Tariq Mansoor"];
@@ -742,25 +541,17 @@
       });
 
       renderList();
-      logEvent("create", `Added new conversation: "${names[idx]}"`);
     });
 
     // Reset list
     document.getElementById("resetCardsBtn").addEventListener("click", () => {
       items = JSON.parse(JSON.stringify(INITIAL_ITEMS));
       renderList();
-      logEvent("reset", "Reset all messages to initial state");
-    });
-
-    // Clear logs
-    document.getElementById("clearLogBtn").addEventListener("click", () => {
-      document.getElementById("logStream").innerHTML = `<div class="text-black/40 dark:text-white/40 italic">Log cleared. Ready for next events.</div>`;
     });
 
     // Audio toggle
     document.getElementById("audioToggleBtn").addEventListener("click", () => {
       soundEnabled = !soundEnabled;
-      document.getElementById("audioLabel").textContent = soundEnabled ? "Sound On" : "Muted";
       document.getElementById("audioIcon").innerHTML = soundEnabled
         ? `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />`
         : `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15zM17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" />`;
@@ -768,8 +559,7 @@
 
     // Theme toggle
     document.getElementById("themeToggleBtn").addEventListener("click", () => {
-      const isDark = document.documentElement.classList.toggle("dark");
-      document.getElementById("themeLabel").textContent = isDark ? "Light" : "Dark";
+      document.documentElement.classList.toggle("dark");
       playAudio(620, 0.05);
     });
 
@@ -781,7 +571,6 @@
       const row = document.getElementById("row-jonas");
       if (row && row.settle) {
         row.settle(-((tileWidth * 2) + tileGap));
-        logEvent("init", "Demo: Peeked Jonas Okafor's trailing actions");
       }
     }, 700);
   </script>
